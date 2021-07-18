@@ -9,7 +9,7 @@ function getmassinfo(){
       	while (true){
           var multiplier = prompt("Enter Number of trees (1-10000)", "1000");
           multiplier = parseInt(multiplier, 10);
-          if (multiplier == NaN || multiplier<1 || multiplier>10000){
+          if (isNan(multiplier) || multiplier<1 || multiplier>10000){
               var multiplier = prompt("Please enter valid number", "1000");
           }else{
               break
