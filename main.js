@@ -1,3 +1,22 @@
+/**
+ * This plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Mass Information Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MARCHABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * @plugin
+ * @name Mass Information
+ * @version 1.0.0
+ * @author Fishball_Noodles#7209
+ * @description This plugin will allow you to view the recipes for Any Splicable Item.
+ * @endplugin
+*/
+
 function getmassinfo(){
   	let itemname = document.getElementById("item-input").value;
   	document.getElementById("generate-info").innerHTML = "Generating...";
