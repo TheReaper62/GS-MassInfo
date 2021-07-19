@@ -28,7 +28,7 @@ function getmassinfo(){
       	while (true){
           var multiplier = prompt("Enter Number of trees (1-10000)", "1000");
           multiplier = parseInt(multiplier, 10);
-          if (isNan(multiplier) || multiplier<1 || multiplier>10000){
+          if (isNaN(multiplier) || multiplier<1 || multiplier>10000){
               var multiplier = prompt("Please enter valid number", "1000");
           }else{
               break
@@ -72,7 +72,7 @@ class GrowStocksMassInfobox {
 			<div class="GTModal ${modalClass}" id="MassInfoModal">
 				<div class="successBox">
 						<div class="header">
-								<span class="growsprite"><img src="https://vignette.wikia.nocookie.net/growtopia/images/8/8f/ItemSprites.png/revision/latest/window-crop/width/32/x-offset/1280/y-offset/128/window-width/32/window-height/32?v9030320216012" title="${itemIcon} icon" itemsprite></span>&nbsp;&nbsp;&nbsp;<p style="font-family: CenturyGothicBold;font-size: 30px;">${title || "Title goes here"}</p><br/>
+								<span class="growsprite"><img src="https://cdn.growstocks.xyz/item/favicon.png" title="Wrench icon" itemsprite></span>&nbsp;&nbsp;&nbsp;<p style="font-family: CenturyGothicBold;font-size: 30px;">${title || "Title goes here"}</p><br/>
 								<p>${description || ""}</p>
 						</div>
                         <label for="item-input">Find Recipe for an Item</label>
