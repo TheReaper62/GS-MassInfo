@@ -1,3 +1,4 @@
+
 /**
  * This plugin is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,42 +12,46 @@
  *
  * @plugin
  * @name Mass Information
- * @version 1.0.0
+ * @version 1.1.0
  * @author Fishball_Noodles#7209
- * @description This plugin will allow you to view the recipes for Any Splicable Item.
+ * @description This plugin will allow you to view the recipes for any splicable item.
  * @endplugin
 */
 
-function getmassinfo(){
-  	let itemname = document.getElementById("item-input").value;
-  	document.getElementById("generate-info").innerHTML = "Generating...";
+function makeSprite(itemName) {
+	return `<img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" title="${itemName} icon" style="float: none; position: relative; top: 10px;" itemsprite>`;
+}
 
-	fetch("https://mass-information-rest-api.fishballcloud.repl.co/api/v1/resources/mass?end_point="+itemname)
+function getMassInfo(){
+  	let itemName = document.getElementById("item-input").value;
+  	document.getElementById("generate-info").value = "Generating...";
+	document.getElementById("generate-info").disabled = true;
+  
+	fetch("https://mass-information-rest-api.fishballcloud.repl.co/api/v1/resources/mass?end_point="+itemName)
 	.then(response => response.json())
 	.then(data => {
-    	console.log(data);
       	while (true){
-          var multiplier = prompt("Enter Number of trees (1-10000)", "1000");
-          multiplier = parseInt(multiplier, 10);
-          if (isNaN(multiplier) || multiplier<1 || multiplier>10000){
-              var multiplier = prompt("Please enter valid number", "1000");
-          }else{
-              break
-          }
+			var multiplier = prompt("How many trees do you want to make (1-10000)", "1000");
+			multiplier = parseInt(multiplier, 10);
+			if (isNaN(multiplier) || multiplier < 1 || multiplier > 10000){
+				var multiplier = alert("The number you've entered was invalid.");
+			}else{
+				break;
+			}
         }
       	
-      	if (data.steps=="Invalid Item"){
-          
-          document.getElementById("mass-ingredients").innerHTML = "This Item is Invalid";
-          document.getElementById("mass-instructions").innerHTML = "This Item is Invalid";
-          alert("Invalid Item!!!")
+      	if (data.steps == "Invalid Item") {
+			document.getElementById("generate-info").disabled = false;
+			document.getElementById("mass-ingredients").innerHTML = "This item is invalid";
+			document.getElementById("mass-instructions").innerHTML = "This item is invalid";
+			alert("The item you provided does not exist or is not spliceable!");
         } else {
           
         	document.getElementById("mass-ingredients").innerHTML = "";
           	for (let i = 0; i < Object.keys(data.ingredients).length; i++) {
         		ele = document.createElement("p");
               	ele.setAttribute("id", Object.keys(data.ingredients)[i]);
-              	ele.innerHTML = Object.keys(data.ingredients)[i] +" : "+multiplier*data.ingredients[Object.keys(data.ingredients)[i]];
+              	ele.innerHTML = makeSprite(Object.keys(data.ingredients)[i]) + " " + Object.keys(data.ingredients)[i] +": "+(multiplier*data.ingredients[Object.keys(data.ingredients)[i]]).toLocaleString();
         		document.getElementById("mass-ingredients").appendChild(ele);
           	}
           
@@ -54,79 +59,83 @@ function getmassinfo(){
             for (let i = 0; i < data.steps.length; i++) {
                 ele = document.createElement("p");
                 ele.setAttribute("id", "step"+i);
-                ele.innerHTML = (i+1)+") "+data.steps[i];
+                let spliced = data.steps[i].split(" = ")[0];
+                let splicer1 = data.steps[i].split(" = ")[1].split(" + ")[0];
+                let splicer2 = data.steps[i].split(" = ")[1].split(" + ")[1];
+
+                ele.innerHTML = (i+1)+") "+`${makeSprite(spliced)} ${spliced} = ${makeSprite(splicer1)} ${splicer1} + ${makeSprite(splicer2)} ${splicer2}`;
                 document.getElementById("mass-instructions").appendChild(ele);
             }
         };
-        
- 	 	document.getElementById("generate-info").innerHTML = "Get Recipe";
+        document.getElementById("generate-info").disabled = false;
+ 	 	document.getElementById("generate-info").value = "Get recipe";
       	
     });
   	
 }
 
-class GrowStocksMassInfobox {
-	static createGrowtopiaModal({ modalClass, itemIcon, title, description, content, footerButtons, triggerClass, closeButtonClass }) {
-		$(`.${modalClass}`).remove();
-		const growtopiaModalCode = `
-			<div class="GTModal ${modalClass}" id="MassInfoModal">
-				<div class="successBox">
-						<div class="header">
-								<span class="growsprite"><img src="https://cdn.growstocks.xyz/item/favicon.png" title="Wrench icon" itemsprite></span>&nbsp;&nbsp;&nbsp;<p style="font-family: CenturyGothicBold;font-size: 30px;">${title || "Title goes here"}</p><br/>
-								<p>${description || ""}</p>
-						</div>
-                        <label for="item-input">Find Recipe for an Item</label>
-                        <br>
-                        <input type="text" id="item-input" placeholder="Enter Item Name" style="color:black"></input>
-                        <br><i style="font-size:12px">Results will take awhile to load</i><br>
-                        <button id="generate-info" class="growButton" onclick="getmassinfo()">Get Recipe</button>
-                        <hr>
-						<div class="colorable">
-							<h2>Ingredients</h2>
-                            <div id="mass-ingredients">Nothing to See here</div>
-							<hr>
-                            <h2>Steps</h2>
-                            <div id="mass-instructions">Nothing to See here</div>
-                            <hr>
-                            <div style="position: sticky; bottom: 1rem; left: 1rem; background-color: rgba(0,0,0,0.75); padding: 0.5rem; border-radius: 5px;">
-                                ${footerButtons || `<button class="growButton ${modalClass}-close growCancelButton">Close</button>`}
-                            </div>
-						</div>
+if (window.location.pathname == "/splicing") {
+    document.title = "Splicing | GrowStocks, the online item price checker for Growtopia"
+    $('.gsWrap').html(`
+		<style>
+			.GTText {
+				background: 0 0;
+				padding: 5px 10px;
+				border: none;
+				border-bottom: 3px SOLID #bee8f1;
+				box-shadow: #000 0 2px;
+			}
+	            
+			.colorable p {
+				color: #fce6ba;
+				border-bottom-color: #fce6ba;
+				font-family: CenturyGothicBold,sans-serif;
+				font-size: 22px;
+				display: block;
+			}
+		</style>
+		<div class="dashWrap" style="margin-top: 10px">
+			<div class="trendRes">
+				<div class="itemChipHead">
+					<img title="Wrench icon" src="https://cdn.growstocks.xyz/item/favicon.png" alt="Wrench icon" itemsprite>
+					<div class="textWrap">
+						<h2>Mass Information</h2><br><br>
+						<h4>A plugin that calculates the raw materials needed to splice an item with steps.</h4><br><br>
+					</div>
+					<form class="splicing">
+					<h3 style="color:white;">Find the splicing recipe for an item</h3>
+					<input type="text" value="" class="GTText" placeholder="Item name" id="item-input" required><br>
+					<small><i>Results might take a while to load</i></small><br>
+					<input type="submit" class="growButton" id="generate-info" value="Find recipe"><br>
+					</form>
+					<hr>
+					<div class="colorable">
+					<h2>Ingredients</h2>
+					<div id="mass-ingredients">Nothing to see here yet.</div>
+					<hr>
+					<h2>Steps</h2>
+					<div id="mass-instructions">Nothing to see here yet.</div>
+					<hr>
+					</div>
 				</div>
 			</div>
-		`;
-      	console.log("Creating the Mass Info Modal...")
-		$("body").append(growtopiaModalCode);
-		$(`.${triggerClass}`).on('click', () => GrowStocksMassInfobox.openModalWithClass(modalClass));
-		$(`.${closeButtonClass || `${modalClass}-close`}`).on('click', () => GrowStocksMassInfobox.closeModalWithClass(modalClass));
-      	console.log("Created Mass Info Modal...\nMade by @Fishball_Noodles")
-		
-    }
-
-	static closeModalWithClass(modalClass) {
-		$("." + modalClass).animate({
-			height: "toggle",
-		}, 500, function(){
-			$(".dark-bg").fadeOut();
-		});
-	}
-
-	static openModalWithClass(modalClass) {
-		$(".dark-bg").fadeIn(function(){
-			$("." + modalClass).animate({
-				height: "toggle"
-			}, 500);
-		});
-	}
-
-	static removeGrowtopiaModal(modalClass) {
-		$(`.${modalClass}`).remove();
-	}
+		</div>
+    `);
+  
+  	$("form.splicing").on('submit', function(e){
+		e.preventDefault();
+		getMassInfo();
+	});
+} else if (window.location.pathname == "/") {
+ 	$("h2:contains(Extra features)").parent().parent().after(`
+		<div class="dqRes">
+			<div class="itemChipHead">
+				<img title="Wrench icon" src="https://cdn.growstocks.xyz/item/favicon.png" alt="Wrench icon" itemsprite>	
+				<div class="textWrap">
+					<h2><a class="itemLink" href="/splicing">Mass Information</a></h2><br>
+					<p>A plugin that calculates the raw materials needed to splice an item with steps!</p>
+				</div>
+			</div>
+		</div>
+    `); 
 }
-
-var mass_info =`
-    	<div class="growButton MassInfoTrigger" style="cursor: pointer;background-color: #f56f42;display: flex;align-items: center;justify-content: center;position: fixed;width: 50px;height: 50px;border-radius: 50%;bottom: 1rem;left: 1rem;box-shadow: 0 0 5px rgb(0 0 0 / 65%);z-index: 200;">
-		Mass Info</div>
-`
-$("body").append(mass_info);
-GrowStocksMassInfobox.createGrowtopiaModal({ modalClass: "MassInfoModal", triggerClass: "MassInfoTrigger", content: "Mass Information", itemIcon: "EZ Cook Oven", title: "Mass Information", description: "A plugin that calculates Raw Materials needed for an item with steps." });
